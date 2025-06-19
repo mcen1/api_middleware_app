@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: CHANGEMEapikeymap
+  namespace: changeme
+data:
+  apikeys.yml: |
+    apikeyrelationships:
+      sme:
+        - "sme automation"
+        - "sme-dev"
+      itcc:
+        - "itcc automation"
+      windows:
+        - "windows automation"
+      network:
+        - "network automation"
+      linux:
+        - "linux automation"
+      storage:
+        - "storage automation"
+      sapbasis:
+        - "sap basis automation"
+      pha:
+        - "pha automation"
+      abds:
+        - "ab data streaming automation"
+      cloudpd:
+        - "cloud platform development automation"
+

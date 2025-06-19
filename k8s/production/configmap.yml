@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmapjsonfiles
+  namespace: changeme
+data:
+  throttle.json: |
+    [
+      {
+        "job_name": "job1",
+        "max_pending": 5
+      },
+      {
+        "job_name": "job2",
+        "max_pending": 2
+      }
+    ]

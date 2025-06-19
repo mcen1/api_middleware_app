@@ -1,0 +1,104 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: CHANGEMEpi
+  namespace: changeme
+  labels:
+    app: CHANGEMEpi 
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: CHANGEMEpi
+  template:
+    metadata:
+      labels:
+        app: CHANGEMEpi
+    spec:
+      automountServiceAccountToken: false
+      volumes:
+        - name: CHANGEMEpikeymap-volume
+          configMap:
+            name: CHANGEMEpikeymap
+        - name: configmapjsonfiles-volume
+          configMap:
+            name: configmapjsonfiles
+        - name: CHANGEMEpicreds-volume
+          secret:
+            secretName: CHANGEMEpi-envvars-secret
+      containers:
+      - image: ghcr.io/CHANGEME/CHANGEME/project
+        name: CHANGEMEpi
+        securityContext:
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          seccompProfile:
+            type: RuntimeDefault
+          runAsUser: 15000
+          capabilities:
+            drop:
+              - ALL
+        imagePullPolicy: IfNotPresent
+        command: ['/bin/sh']
+        args: ['-c','/usr/CHANGEME/containerstartup.sh']
+        readinessProbe:
+           exec:
+              command:
+              - /bin/sh
+              - /usr/CHANGEME/health.sh
+           initialDelaySeconds: 35
+           periodSeconds: 60
+           timeoutSeconds: 60
+           failureThreshold: 2
+        livenessProbe:
+           exec:
+              command:
+              - /bin/sh
+              - /usr/CHANGEME/health.sh
+           initialDelaySeconds: 30
+           periodSeconds: 300
+           timeoutSeconds: 60
+           failureThreshold: 4
+        volumeMounts:
+        - name: CHANGEMEpikeymap-volume
+          mountPath: /usr/CHANGEME/apikeys.yml
+          subPath: apikeys.yml
+          readOnly: true
+        - name: CHANGEMEpicreds-volume
+          mountPath: /usr/CHANGEME/envvars.sh
+          subPath: envvars.sh
+          readOnly: true
+        - name: configmapjsonfiles-volume
+          mountPath: /usr/CHANGEME/configs/throttle.yml
+          subPath: throttle.yml
+          readOnly: true
+        env:
+            # change per env
+          - name: AWX_URL
+            value: 'ap.CHANGEME'
+          - name: CERT_VERIFY
+            value: '/etc/ssl/certs/ca-certificates.crt'
+          - name: SNOW_HOST
+            value: 'https://CHANGEME.service-now.com'
+          - name: SECTIGO_BASE_URL
+            value: 'https://cert-manager.com'
+          - name: MAX_RUNTIME
+            value: "360"
+          - name: CONFIGMAP_DIR
+            value: "/usr/CHANGEME/configs/"
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+      restartPolicy: Always
+
+ 

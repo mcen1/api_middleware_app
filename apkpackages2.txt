@@ -1,0 +1,1 @@
+build-dependencies build-base python3-dev

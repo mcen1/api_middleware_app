@@ -1,0 +1,1 @@
+coreutils python3 py3-pip curl busybox-extras jq
